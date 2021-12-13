@@ -122,7 +122,7 @@ alt.on('keydown', (key) => {
 let isOpen = true
 
 alt.everyTick(() => {
-    drawText2D('URP OpenSource DEMO', { x: 0.5, y: 0.0125 }, 0.35, { r: 255, g: 255, b: 255, a: 125 }, 0);
+    drawText2D('AWL RP DEMO', { x: 0.5, y: 0.0125 }, 0.35, { r: 255, g: 255, b: 255, a: 125 }, 0);
     if(isOpen) {
         drawText2D('F1: toggle HUD', { x: 0.8, y: 0.025 }, 0.35, { r: 255, g: 255, b: 255, a: 255 }, 1);
         drawText2D('T / Enter: open chat', { x: 0.8, y: 0.05 }, 0.35, { r: 255, g: 255, b: 255, a: 255 }, 1);
