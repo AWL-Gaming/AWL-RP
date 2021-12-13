@@ -58,13 +58,13 @@ const handleDeathMovement = () => {
     const timeLeft = deathTime - Date.now();
     if (timeLeft > 0) {
         utils.drawText2D(
-            `${(timeLeft / 1000).toFixed(2)}s até ser revivido`,
+            `${(timeLeft / 1000).toFixed(2)}s for revival`,
             { x: 0.5, y: 0.2 },
             0.5,
             new alt.RGBA(255, 255, 255, 255)
         );
     } else {
-        utils.drawText2D(`Revivendo...`, { x: 0.5, y: 0.2 }, 0.5, new alt.RGBA(255, 255, 255, 255));
+        utils.drawText2D(`Reviving...`, { x: 0.5, y: 0.2 }, 0.5, new alt.RGBA(255, 255, 255, 255));
     }
 }
 
