@@ -1,0 +1,17 @@
+[{
+		"type": "package",
+		"name": "elliptic"
+	},
+	{
+		"type": "package",
+		"name": "sjcl"
+	},
+	{
+		"type": "package",
+		"name": "axios"
+	},
+	{
+		"type": "package",
+		"name": "dotenv"
+	}
+]

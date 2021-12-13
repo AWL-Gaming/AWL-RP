@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Discord Auth by Stuyk</title>
+        <link rel="stylesheet/less" type="text/css" href="style.less" />
+    </head>
+    <body>
+        <div id="app">
+            <div class="container" v-if="show">
+                <h2>Authentication</h2>
+                <p>{{ info }}</p>
+                <button @click="beginAuth">Begin Discord Auth</button>
+            </div>
+            <div class="container" v-if="!show">
+                <div class="lds-ring">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+        <script src="js/vue.min.js"></script>
+        <script src="js/less.min.js"></script>
+        <script src="app.js" type="text/javascript"></script>
+    </body>
+</html>

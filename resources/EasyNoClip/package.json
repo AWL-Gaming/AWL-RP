@@ -1,0 +1,19 @@
+{
+  "type": "module",
+  "name": "easynoclip",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "repository": {
+  },
+  "keywords": [
+
+  ],
+  
+  "author": "Swox",
+  "license": "MIT License",
+  "bugs": {
+    
+  }
+  
+}
