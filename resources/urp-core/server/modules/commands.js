@@ -9,13 +9,14 @@ chat.registerCmd('addItem', (source, args) => {
       alt.emitClient(source,'notify', 'error', Core.Translate('COMMANDS.LABEL'), '/addItem item_name amount')
       return;
    } 
-   const isAllowed = Core.Functions.hasPermission(source, 'admin')
-   if(isAllowed){
+   //const isAllowed = Core.Functions.hasPermission(source, 'admin')
+   //if(isAllowed){
         Core.Inventory.addItem(source, item, amount, slot ? slot : undefined)
-   }else{
-      alt.emitClient(source,'notify', 'error', Core.Translate('PERMISSIONS.LABEL'), Core.Translate('PERMISSIONS.DONT_HAVE_PERM'))
-   }
+   //}else{
+   //   alt.emitClient(source,'notify', 'error', Core.Translate('PERMISSIONS.LABEL'), Core.Translate('PERMISSIONS.DONT_HAVE_PERM'))
+   
 })
+
 
 chat.registerCmd('tpcds', (source, [x, y, z]) => {
    if(!x || !y || !z){
