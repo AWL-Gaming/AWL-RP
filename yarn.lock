@@ -13,14 +13,14 @@
   "version" "1.4.3"
 
 "@altv/types-server@^2.1.4":
-  "integrity" "sha512-dCoqVqWXQ5R9huYURNDVNVfN+8GtfwOb7XtvbfMiJwwn9KZXzkHL5BUwauSF1mMuSDi9Rh+ny8j29Mg0wFSziA=="
-  "resolved" "https://registry.npmjs.org/@altv/types-server/-/types-server-2.1.4.tgz"
-  "version" "2.1.4"
+  "integrity" "sha512-ByFtyG6wq7H5NZAeEPggLfEB4b72NfR11+cQhvQb8J9NXJL7MAODInYj34KOsoRc3z82IBIjbWxXWYQ7tlk1bQ=="
+  "resolved" "https://registry.npmjs.org/@altv/types-server/-/types-server-2.1.7.tgz"
+  "version" "2.1.7"
 
 "@altv/types-shared@^1.1.1", "@altv/types-shared@1.1.x":
-  "integrity" "sha512-9p/6KffTAU4RU3YLGjGrV7HN7IeEKN9NWKAauALfovEd+ZAFAyZ58kqdvu+E2Asptv8h2em6ogggKEc5+qkqUA=="
-  "resolved" "https://registry.npmjs.org/@altv/types-shared/-/types-shared-1.1.1.tgz"
-  "version" "1.1.1"
+  "integrity" "sha512-jsSDRlIW+hsIMco1NkAUCUtf2oW83MfcA0Hhf0jkJjkx9ehl8n+YRGVRi4Mcejpt35BmAkTvgn1AvvAMk66miw=="
+  "resolved" "https://registry.npmjs.org/@altv/types-shared/-/types-shared-1.1.2.tgz"
+  "version" "1.1.2"
 
 "@altv/types-webview@^1.0.2":
   "integrity" "sha512-3RceTutIDS/XV8YUn/AiSe61BERBb6LfCCQxIcN5bvlh26lPXC0naxtQTcG39pSgj8a5iiVT8LaRNdEZP6JBcA=="
@@ -38,9 +38,9 @@
   "version" "4.0.0"
 
 "debug@^4.1.1":
-  "integrity" "sha512-mOp8wKcvj7XxC78zLgw/ZA+6TSgkoE2C/ienthhRD298T7UNwAg9diBpLRxC0mOezLl4B0xV7M0cCO6P/O0Xhw=="
-  "resolved" "https://registry.npmjs.org/debug/-/debug-4.3.2.tgz"
-  "version" "4.3.2"
+  "integrity" "sha512-/zxw5+vh1Tfv+4Qn7a5nsbcJKPaSvCDhojn6FEl9vupwK2VCSDtEiEtqr8DFtzYFOdz63LBkxec7DYuc2jon6Q=="
+  "resolved" "https://registry.npmjs.org/debug/-/debug-4.3.3.tgz"
+  "version" "4.3.3"
   dependencies:
     "ms" "2.1.2"
 
