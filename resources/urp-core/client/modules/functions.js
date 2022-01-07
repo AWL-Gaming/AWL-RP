@@ -33,6 +33,11 @@ const getPlayerData = (key) => {
     return alt.Player.local.playerData[key]
 }
 
+const getJob = () => {
+    if(!alt.Player.local.playerData.job) return undefined;
+    return alt.Player.local.playerData.job
+}
+
 const handleDeath = (value) => {
     if(value){
         if (!deathInterval) {
@@ -289,8 +294,6 @@ const stopAnim = () => {
 
 const disableConfigFlags = () => {
     natives.setPedConfigFlag(alt.Player.local.scriptID, 184, true)
-    //  Disable engine auto start
-    natives.setPedConfigFlag(alt.Player.local.scriptID, 429, true)
     //  Keep engine running
     natives.setPedConfigFlag(alt.Player.local.scriptID, 241, true)
 }
@@ -298,6 +301,8 @@ const disableConfigFlags = () => {
 const disableBehaviours = () => {
     disableConfigFlags()
     alt.everyTick(() => {
+    //  Disable engine auto start
+    natives.setPedConfigFlag(alt.Player.local.scriptID, 429, true)
     // Fix webview
     natives.drawRect(0, 0, 0, 0, 0, 0, 0, 0, false)
     //  Disable default weapon switch
@@ -337,4 +342,4 @@ const handleVehicleStates = (vehicle, key, value, oldValue) => {
 }
 
 export default {startTicks, handleSetplayerData, getPlayerData, handleDeath, RequestModel, getMetaData, playAnim, 
-    stopAnim, disableBehaviours, handleVehicleStates, disableConfigFlags}
+    stopAnim, disableBehaviours, handleVehicleStates, disableConfigFlags, getJob}

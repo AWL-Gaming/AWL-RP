@@ -163,6 +163,7 @@ const selectCharacter = async (source, playerData, fromCreation = false) => {
     // const model = 'mp_m_freemode_01'
     chat.send(source, `Logged in successfully! Press F7 to hide UI`);
     Core.Functions.emitPlayerData(source, 'charinfo', source.playerData.charinfo)
+    Core.Functions.emitPlayerData(source, 'job', source.playerData.job)
     Core.Functions.emitPlayerData(source, 'inventory', source.playerData.inventory)
     Core.Functions.emitPlayerData(source, 'metadata', source.playerData.metadata)
     Core.Functions.emitPlayerData(source, 'money',  source.playerData.money)
@@ -182,6 +183,7 @@ const selectCharacter = async (source, playerData, fromCreation = false) => {
     }
     if(source.playerData.firstTime){
         alt.emitClient(source, 'Core:Client:UpdateIdentity')
+        alt.emit('Core:Phone:CreateSQL', source)
         source.playerData.firstTime = false
     }
 }
@@ -396,4 +398,4 @@ const loadCustoms = async (source) => {
     createCustoms(source)
 }
 
-export default { startCharacter, selectCharacter, tickManager, updateBasicData, loadCustoms, changeCloth, setDeath, getComponentVariations }
+export default { startCharacter, selectCharacter, tickManager, updateBasicData, loadCustoms, changeCloth, setDeath, getComponentVariations, saveMetadata }

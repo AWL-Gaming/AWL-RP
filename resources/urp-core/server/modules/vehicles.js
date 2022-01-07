@@ -56,8 +56,8 @@ const addToSource = async(source, model, initialPosition = { x: 0, y: 0, z: 0 },
     newVehicle.model = model
     newVehicle.position = initialPosition
     newVehicle.plate = await generatePlate()
-    newVehicle.status = {}
-    newVehicle.metadata = { fuel: 100 }
+    newVehicle.status = { bodyHealth: 1000 }
+    newVehicle.metadata = { fuel: 15 }
     newVehicle.customizations = {}
     const id = await insertSync('INSERT INTO characters_vehicles (ssn, model, position, plate, status, metadata, customizations) VALUES (?,?,?,?,?,?,?)', [ssn, newVehicle.model, JSON.stringify(newVehicle.position), newVehicle.plate, JSON.stringify(newVehicle.status), JSON.stringify(newVehicle.metadata), JSON.stringify(newVehicle.customizations)])
 
@@ -71,7 +71,7 @@ const addToSource = async(source, model, initialPosition = { x: 0, y: 0, z: 0 },
 }
 
 const putInGarage = (source, vehicle) => {
-    if(!pool[vehicle.data.id]) return;
+    if(!pool[vehicle.data.id]) {vehicle.destroy(); return;}
     if(source.playerData.ssn !== vehicle.data.ssn) return;
     if(vehicle.timeoutTicker){
         alt.clearTimeout(vehicle.timeoutTicker)
@@ -83,11 +83,10 @@ const putInGarage = (source, vehicle) => {
     vehicle.destroy()
 }
 
-const spawn = (vehicleData, pos, rot) => {
-    if (pool[vehicleData.id]) {
-        throw new Error('Vehicle already spawned')
-    }
-
+const spawn = (source, vehicleData, pos, rot) => {
+    if(vehicleData.status.destroyed) {
+        alt.emitClient(source, 'notify', 'error', Core.Translate('VEHICLES.LABEL'), 'o carro deu pt'); return;}
+    if (pool[vehicleData.id]) {alt.emitClient(source,'notify', 'error', 'GARAGE', 'VEHICLE ALREADY SPAWNED'); return;}
     if (pos) {
         vehicleData.position = pos;
     }
@@ -115,8 +114,8 @@ const spawn = (vehicleData, pos, rot) => {
 
     vehicle.engineOn = false
 
-    if (vehicleData.customizations.primaryColor && vehicleData.customizations.secondaryColor) {
-        loadMods(vehicle, vehicleData.customizations, vehicleData.model)
+    if (vehicleData.customizations.customPrimaryColor && vehicleData.customizations.customSecondaryColor) {
+        loadMods(vehicle, vehicleData.customizations)
     }
 
     if (vehicleData.status) {
@@ -143,7 +142,7 @@ const spawnById = async(source, id, pos, rot) => {
     vehicleData[0].metadata = JSON.parse(vehicleData[0].metadata)
     vehicleData[0].model = vehicleData[0].model
     vehicleData[0].customizations = JSON.parse(vehicleData[0].customizations)
-    spawn(vehicleData[0], pos, rot)
+    spawn(source, vehicleData[0], pos, rot)
 }
 
 const sourceEnteredInVehicle = (source, vehicle, seat) => {
@@ -251,6 +250,8 @@ const saveVehicleMetadata = (vehicle) => {
 }
 
 const setMod = (source,index, id) => {
+    
+	console.log(source.vehicle);
     if (source.vehicle === null) return;
     if (source.vehicle.modKit != 1 || source.vehicle.modKit == 1 ) {
         
@@ -263,20 +264,66 @@ const setMod = (source,index, id) => {
 
 const setColor = (source, index, r, g, b, a) => {
     if (source.vehicle === null) return;
-
-    if(index == `color1`) {
+    if(index == `primary`) {
         source.vehicle.customPrimaryColor = {r,g,b,a}
     }
-    if (index == `color2`) {
+    if (index == `secondary`) {
         source.vehicle.customSecondaryColor = {r,g,b,a}
     }
 }
 
+const setNeon = (source, r, g, b) => {
+    if (source.vehicle === null) return;
+    source.vehicle.neon = {
+        front: true,
+        back: true,
+        left: true,
+        right: true
+    };
+    source.vehicle.neonColor = {
+        r: r,
+        g: g,
+        b: b,
+        a: 255
+    };
+}
+
+const hasFuel = (source) => {
+    const closestVeh = alt.Vehicle.all.find((targetVehicle) => source.pos.distanceTo(targetVehicle.pos) < 3.5)
+    if (!closestVeh) return alt.log(`nao tem carro perto`)
+    if (!closestVeh.data) return; 
+    return closestVeh.data.metadata.fuel
+}
+const fuelTankSize = (source) => {
+    const closestVeh = alt.Vehicle.all.find((targetVehicle) => source.pos.distanceTo(targetVehicle.pos) < 3.5)
+    if (!closestVeh) return alt.log(`nao tem carro perto`)
+    if (!closestVeh.data) return; 
+    let model = closestVeh.data.model
+    if (!VehList[model]) return 50
+    return VehList[model].fuelTank
+}
+const fuelType = (source) => {
+    const closestVeh = alt.Vehicle.all.find((targetVehicle) => source.pos.distanceTo(targetVehicle.pos) < 3.5)
+    if (!closestVeh) return alt.log(`nao tem carro perto`)
+    if (!closestVeh.data) return; 
+    let model = closestVeh.data.model
+    return VehList[model].fuelType
+}
+const reFuel = (source, value) => {
+    const closestVeh = alt.Vehicle.all.find((targetVehicle) => source.pos.distanceTo(targetVehicle.pos) < 3.5)
+    if (!closestVeh) return alt.log(`nao tem carro perto`)
+    if (!closestVeh.data) return; 
+    closestVeh.data.metadata.fuel = parseInt(closestVeh.data.metadata.fuel) + parseInt(value)
+    db.execute('UPDATE characters_vehicles SET metadata = ? WHERE ssn = ? AND id = ?', [JSON.stringify(closestVeh.data.metadata), closestVeh.data.ssn, closestVeh.data.id], undefined, alt.resourceName)    
+}
+
 const saveMods = (vehicle) => {
     if (!vehicle.data) return;
+    console.log(vehicle.data);
     vehicle.data.customizations = getMods(vehicle, vehicle.data.model);
     db.execute('UPDATE characters_vehicles SET customizations = ? WHERE ssn = ? AND id = ?', [JSON.stringify(vehicle.data.customizations), vehicle.data.ssn, vehicle.data.id], undefined, alt.resourceName)    
 }
+
 
 const saveStatus = (vehicle) => {
     if (!vehicle.data) return;
@@ -286,8 +333,9 @@ const saveStatus = (vehicle) => {
 
 const getMods = (vehicle) => {
     const data = {
-        primaryColor: vehicle.customPrimaryColor,
-        secondaryColor: vehicle.customSecondaryColor,
+        modKit: vehicle.modKit = 1,
+        customPrimaryColor: vehicle.customPrimaryColor,
+        customSecondaryColor: vehicle.customSecondaryColor,
         neon: vehicle.neon,
         neonColor: vehicle.neonColor,
         interiorColor: vehicle.interiorColor,
@@ -334,19 +382,21 @@ const getMods = (vehicle) => {
 }
 
 
-const loadMods = (vehicle, data, model) => {
-    if (vehicle.modKit != 1) vehicle.modKit = 1;        
-    alt.nextTick(() => {           
-        if(VehList[model].category == `motorcycles`){
-            vehicle.setMod(modType.Back_Wheels, data.Back_Wheels)
-        }
-
-        vehicle.neon = data.neon,
+const loadMods = (vehicle, data) => {
+    console.log(data);
+    vehicle.modKit = 1;        
+    alt.nextTick(() => {
+        vehicle.modKit = data.modKit
+        vehicle.neon = data.neon
         vehicle.neonColor = data.neonColor
+        
+        vehicle.customPrimaryColor = data.customPrimaryColor
+        vehicle.customSecondaryColor = data.customSecondaryColor
+
         vehicle.interiorColor = data.interiorColor
         vehicle.dashboardColor = data.dashboardColor
         vehicle.windowTint = data.windowTint
-
+        vehicle.setMod(modType.Back_Wheels, data.Back_Wheels) // only for motorcycles
         vehicle.setMod(modType.Spoilers, data.Spoilers)
         vehicle.setMod(modType.Front_Bumper, data.Front_Bumper)
         vehicle.setMod(modType.Rear_Bumper, data.Rear_Bumper)
@@ -388,23 +438,42 @@ const loadMods = (vehicle, data, model) => {
 
 const getStatus = vehicle => {
     const data = {
-        weels_FrontLeft: vehicle.doesWheelHasTire(indexVehicle.weels_FrontLeft),
-        weels_FrontRight: vehicle.doesWheelHasTire(indexVehicle.weels_FrontRight),
-        weels_MiddleLeft: vehicle.doesWheelHasTire(indexVehicle.weels_MiddleLeft),
-        weels_MiddleRight: vehicle.doesWheelHasTire(indexVehicle.weels_MiddleRight),
-        weels_RearLeft: vehicle.doesWheelHasTire(indexVehicle.weels_RearLeft),
-        weels_RearRight: vehicle.doesWheelHasTire(indexVehicle.weels_RearRight),
-        weels_middleLeftTrailer: vehicle.doesWheelHasTire(indexVehicle.weels_middleLeftTrailer),
-        weels_middleRightTrailer: vehicle.doesWheelHasTire(indexVehicle.weels_middleRightTrailer),
+        destroyed: vehicle.destroyed,
+        dirtLevel: vehicle.dirtLevel,
+        bodyHealth: vehicle.bodyHealth,
 
-        windows_CREEN: vehicle.getArmoredWindowHealth(indexVehicle.windows_CREEN),
-        windows_CREEN_R: vehicle.getArmoredWindowHealth(indexVehicle.windows_CREEN_R),
-        windows_LF: vehicle.getArmoredWindowHealth(indexVehicle.windows_LF),
-        windows_RF: vehicle.getArmoredWindowHealth(indexVehicle.windows_RF),
-        windows_LR: vehicle.getArmoredWindowHealth(indexVehicle.windows_LR),
-        windows_RR: vehicle.getArmoredWindowHealth(indexVehicle.windows_RR),
-        windows_LM: vehicle.getArmoredWindowHealth(indexVehicle.windows_LM),
-        windows_RM: vehicle.getArmoredWindowHealth(indexVehicle.windows_RM),
+        door_DriverFront: vehicle.getDoorState(indexVehicle.door_DriverFront),
+        door_PassengerFront: vehicle.getDoorState(indexVehicle.door_PassengerFront),
+        door_DriverRear: vehicle.getDoorState(indexVehicle.door_DriverRear),
+        door_PassengerRear: vehicle.getDoorState(indexVehicle.door_PassengerRear),
+        door_Hood: vehicle.getDoorState(indexVehicle.door_Hood),
+        door_Trunk: vehicle.getDoorState(indexVehicle.door_Trunk),
+        
+        bumperDamageLevel_bumper_FRONT: vehicle.getBumperDamageLevel(indexVehicle.bumper_FRONT),
+        bumperDamageLevel_bumper_REAR: vehicle.getBumperDamageLevel(indexVehicle.bumper_REAR),
+        
+        specialLightDamaged_UNKNOWN1: vehicle.isSpecialLightDamaged(indexVehicle.light_UNKNOWN1),
+        specialLightDamaged_UNKNOWN1: vehicle.isSpecialLightDamaged(indexVehicle.light_UNKNOWN1),
+        specialLightDamaged_BACK_LEFT: vehicle.isSpecialLightDamaged(indexVehicle.light_BACK_LEFT),
+        specialLightDamaged_BACK_RIGHT: vehicle.isSpecialLightDamaged(indexVehicle.light_BACK_RIGHT),
+        specialLightDamaged_LEFT_FRONT: vehicle.isSpecialLightDamaged(indexVehicle.light_LEFT_FRONT),
+        specialLightDamaged_RIGHT_FRONT: vehicle.isSpecialLightDamaged(indexVehicle.light_RIGHT_FRONT),
+
+        lightDamaged_UNKNOWN1: vehicle.isLightDamaged(indexVehicle.light_UNKNOWN1),
+        lightDamaged_UNKNOWN1: vehicle.isLightDamaged(indexVehicle.light_UNKNOWN1),
+        lightDamaged_BACK_LEFT: vehicle.isLightDamaged(indexVehicle.light_BACK_LEFT),
+        lightDamaged_BACK_RIGHT: vehicle.isLightDamaged(indexVehicle.light_BACK_RIGHT),
+        lightDamaged_LEFT_FRONT: vehicle.isLightDamaged(indexVehicle.light_LEFT_FRONT),
+        lightDamaged_RIGHT_FRONT: vehicle.isLightDamaged(indexVehicle.light_RIGHT_FRONT),
+
+        armoredWindowHealth_CREEN: vehicle.getArmoredWindowHealth(indexVehicle.windows_CREEN),
+        armoredWindowHealth_CREEN_R: vehicle.getArmoredWindowHealth(indexVehicle.windows_CREEN_R),
+        armoredWindowHealth_LF: vehicle.getArmoredWindowHealth(indexVehicle.windows_LF),
+        armoredWindowHealth_RF: vehicle.getArmoredWindowHealth(indexVehicle.windows_RF),
+        armoredWindowHealth_LR: vehicle.getArmoredWindowHealth(indexVehicle.windows_LR),
+        armoredWindowHealth_RR: vehicle.getArmoredWindowHealth(indexVehicle.windows_RR),
+        armoredWindowHealth_LM: vehicle.getArmoredWindowHealth(indexVehicle.windows_LM),
+        armoredWindowHealth_RM: vehicle.getArmoredWindowHealth(indexVehicle.windows_RM),
 
         front_BumperDamage: vehicle.getBumperDamageLevel(indexVehicle.bumper_FRONT),
         rear_BumperDamage: vehicle.getBumperDamageLevel(indexVehicle.bumper_REAR),
@@ -421,28 +490,48 @@ const getStatus = vehicle => {
 
 const reloadMods = (source) => {
     const vehicle = source.vehicle
-    loadMods(vehicle, vehicle.data.customizations, vehicle.data.model)
+    if(!vehicle.data.customizations) return;
+    loadMods(vehicle, vehicle.data.customizations)
 }
 
 const loadStatus = (vehicle, data) => {
     alt.nextTick(() => {
-        vehicle.doesWheelHasTire(data.weels_FrontLeft)
-        vehicle.doesWheelHasTire(data.weels_FrontRight)
-        vehicle.doesWheelHasTire(data.weels_MiddleLeft)
-        vehicle.doesWheelHasTire(data.weels_MiddleRight)
-        vehicle.doesWheelHasTire(data.weels_RearLeft)
-        vehicle.doesWheelHasTire(data.weels_RearRight)
-        vehicle.doesWheelHasTire(data.weels_middleLeftTrailer)
-        vehicle.doesWheelHasTire(data.weels_middleRightTrailer)
 
-        vehicle.setArmoredWindowHealth(indexVehicle.windows_CREEN, data.windows_CREEN)
-        vehicle.setArmoredWindowHealth(indexVehicle.windows_CREEN_R, data.windows_CREEN_R)
-        vehicle.setArmoredWindowHealth(indexVehicle.windows_LF, data.windows_LF)
-        vehicle.setArmoredWindowHealth(indexVehicle.windows_RF, data.windows_RF)
-        vehicle.setArmoredWindowHealth(indexVehicle.windows_LR, data.windows_LR)
-        vehicle.setArmoredWindowHealth(indexVehicle.windows_RR, data.windows_RR)
-        vehicle.setArmoredWindowHealth(indexVehicle.windows_LM, data.windows_LM)
-        vehicle.setArmoredWindowHealth(indexVehicle.windows_RM, data.windows_RM)
+        vehicle.dirtLevel = data.dirtLevel
+        vehicle.bodyHealth = data.bodyHealth
+
+        vehicle.setDoorState(indexVehicle.door_DriverFront, data.door_DriverFront),
+        vehicle.setDoorState(indexVehicle.door_PassengerFrontdoor_DriverFront, data.door_PassengerFront),
+        vehicle.setDoorState(indexVehicle.door_DriverReardoor_DriverFront, data.door_DriverRear),
+        vehicle.setDoorState(indexVehicle.door_PassengerReardoor_DriverFront, data.door_PassengerRear),
+        vehicle.setDoorState(indexVehicle.door_Hooddoor_DriverFront, data.door_Hood),
+        vehicle.setDoorState(indexVehicle.door_Trunkdoor_DriverFront, data.door_Trunk),
+
+        vehicle.setBumperDamageLevel(indexVehicle.bumper_FRONT, data.bumperDamageLevel_bumper_FRONT),
+        vehicle.setBumperDamageLevel(indexVehicle.bumper_REAR, data.bumperDamageLevel_bumper_REAR),
+
+        vehicle.setSpecialLightDamaged(indexVehicle.light_UNKNOWN1, data.specialLightDamaged_UNKNOWN1),
+        vehicle.setSpecialLightDamaged(indexVehicle.light_UNKNOWN1, data.specialLightDamaged_UNKNOWN1),
+        vehicle.setSpecialLightDamaged(indexVehicle.light_BACK_LEFT, data.specialLightDamaged_BACK_LEFT),
+        vehicle.setSpecialLightDamaged(indexVehicle.light_BACK_RIGHT, data.specialLightDamaged_BACK_RIGHT),
+        vehicle.setSpecialLightDamaged(indexVehicle.light_LEFT_FRONT, data.specialLightDamaged_LEFT_FRONT),
+        vehicle.setSpecialLightDamaged(indexVehicle.light_RIGHT_FRONT, data.specialLightDamaged_RIGHT_FRONT),
+
+        vehicle.setLightDamaged(indexVehicle.light_UNKNOWN1, data.lightDamaged_UNKNOWN1),
+        vehicle.setLightDamaged(indexVehicle.light_UNKNOWN1, data.lightDamaged_UNKNOWN1),
+        vehicle.setLightDamaged(indexVehicle.light_BACK_LEFT, data.lightDamaged_BACK_LEFT),
+        vehicle.setLightDamaged(indexVehicle.light_BACK_RIGHT, data.lightDamaged_BACK_RIGHT),
+        vehicle.setLightDamaged(indexVehicle.light_LEFT_FRONT, data.lightDamaged_LEFT_FRONT),
+        vehicle.setLightDamaged(indexVehicle.light_RIGHT_FRONT, data.lightDamaged_RIGHT_FRONT),
+
+        vehicle.setArmoredWindowHealth(indexVehicle.windows_CREEN, data.armoredWindowHealth_CREEN)
+        vehicle.setArmoredWindowHealth(indexVehicle.windows_CREEN_R, data.armoredWindowHealth_CREEN_R)
+        vehicle.setArmoredWindowHealth(indexVehicle.windows_LF, data.armoredWindowHealth_LF)
+        vehicle.setArmoredWindowHealth(indexVehicle.windows_RF, data.armoredWindowHealth_RF)
+        vehicle.setArmoredWindowHealth(indexVehicle.windows_LR, data.armoredWindowHealth_LR)
+        vehicle.setArmoredWindowHealth(indexVehicle.windows_RR, data.armoredWindowHealth_RR)
+        vehicle.setArmoredWindowHealth(indexVehicle.windows_LM, data.armoredWindowHealth_LM)
+        vehicle.setArmoredWindowHealth(indexVehicle.windows_RM, data.armoredWindowHealth_RM)
 
         vehicle.setPartDamageLevel(indexVehicle.partId_FrontLeft, data.partId_FrontLeft)
         vehicle.setPartDamageLevel(indexVehicle.partId_FrontRight, data.partId_FrontRight)
@@ -473,5 +562,10 @@ export default {
     saveMods,
     setColor,
     loadMods,
-    reloadMods
+    reloadMods,
+    hasFuel,
+    fuelTankSize,
+    reFuel,
+    fuelType,
+    setNeon
 }

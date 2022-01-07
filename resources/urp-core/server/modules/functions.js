@@ -1,6 +1,8 @@
 import * as alt from 'alt-server';
 import * as chat from 'urp-chat';
 
+import db from 'mysql2-wrapper';
+
 import Core from '../main';
 
 import { executeSync, insertSync, updateSync, hashString, compareHash, getVectorInFrontOfPlayer, getClosestEntity } from '../libs/utils';
@@ -35,8 +37,8 @@ const login = async(source) => {
             return
         }
         console.log(Core.Translate('ACCOUNT.NEW_CREATED ', { sID: source.socialID }))
-        Core.Character.startCharacter(source)
-            // Now we start the character
+        source.kick(Core.Translate('ACCOUNT.NOT_ALLOW_LISTED', {socialID: source.socialID}))
+        return;
     } else {
         const dataMatch = compareHash(uID, account[0].identifier);
         if (!dataMatch) {
@@ -47,10 +49,35 @@ const login = async(source) => {
             source.kick(Core.Translate('ACCOUNT.BANNED'))
             return;
         }
-        console.log(Core.Translate('ACCOUNT.LOGIN', { playerName: `${source.name}`, sID: `${source.socialID}` }))
-        Core.Character.startCharacter(source)
-            // Now we start the character
+        if(!Core.Config.WhitelistOn){
+            console.log(Core.Translate('ACCOUNT.LOGIN', { playerName: `${source.name}`, sID: `${source.socialID}` }))
+            Core.Character.startCharacter(source)
+            return;
+        }
+        if (!account[0].whitelisted) {
+            source.kick(Core.Translate('ACCOUNT.NOT_ALLOW_LISTED', {socialID: account[0].id}))
+            return;
+        } else {
+            console.log(Core.Translate('ACCOUNT.LOGIN', { playerName: `${source.name}`, sID: `${source.socialID}` }))
+            Core.Character.startCharacter(source)
+                // Now we start the character
+        }
     }
+}
+
+//  Player whitelist status
+const whiteliststatus = async(source, id) => {
+    const result = await executeSync('SELECT whitelisted from users WHERE id = ?', [id])
+    if (result.length <= 0) {
+       alt.emitClient(source,'notify', 'error', Core.Translate('COMMANDS.LABEL'), Core.Translate('COMMANDS.USER_ID_NOT_FOUND'))
+       return;
+       }else if (result[0].whitelisted) {
+       alt.emitClient(source,'notify', 'error', Core.Translate('COMMANDS.LABEL'), Core.Translate('COMMANDS.USER_ID_ALLREADY_WHITELISTED'))
+       return;
+       }else{
+    updateSync('UPDATE users SET whitelisted = ? WHERE id = ?', [1, id], undefined, alt.resourceName)
+    alt.emitClient(source,'notify', 'sucess', Core.Translate('COMMANDS.LABEL'), Core.Translate('COMMANDS.USER_ID_WHITELISTED'))
+       }
 }
 
 // Player utils
@@ -88,8 +115,9 @@ const getIdentityByProximity = (source) => {
 // Vehicles
 const spawnVehicle = (source, model) => {
     try {
-        const fwd = getVectorInFrontOfPlayer(source, 5)
+        const fwd = getVectorInFrontOfPlayer(source, 1)
         const vehicle = new alt.Vehicle(model, fwd.x, fwd.y, fwd.z, 0, 0, 0)
+        source.setIntoVehicle(vehicle, 1)
         vehicle.numberPlateText = 'STAFF'
         vehicle.engineOn = true
         vehicle.data = {
@@ -198,7 +226,7 @@ const GetSsn = (source, dt) => {
     alt.emitClient(target, 'Phone:inviteCallRequest', source.playerData.phone)
   }
   
-  const createCallPhone = (source, phone) => {
+const createCallPhone = (source, phone) => {
     console.log(`[createCallPhone] caller ${source.playerData.phone} target ${phone}`)
     const target = getSourceTargetByPhone(phone)
     console.log(target)
@@ -210,9 +238,9 @@ const GetSsn = (source, dt) => {
     source.playerData.inCall = {state: true, voiceChannel: phone}
     target.playerData.inCall = {state: true, voiceChannel: phone}
     alt.emitClient(target, 'Phone:inCall')
-  }
+}
   
-  const endCall = (source, phone) => {
+const endCall = (source, phone) => {
     console.log(`[endCall] caller ${source.playerData.phone} target ${phone}`)
     const target = getSourceTargetByPhone(phone)
     if (!target) return
@@ -226,19 +254,50 @@ const GetSsn = (source, dt) => {
     alt.emitClient(target, 'Phone:endCall')
     alt.emitClient(source, 'Phone:endCall')
     console.log("close chanel");
-  }
+}
   
   
-  const PhoneTunel = (source,targtEvent,dataRvent,phone)=>{
+const PhoneTunel = (source,targtEvent,dataRvent,phone)=>{
     const target = alt.Player.all.find(s => s.playerData.phone === parseInt(phone))
     if (target) {
         alt.emitClient(target,targtEvent,target,dataRvent)
     }
-  }
+}
+
+const setJob = (source, job, grade) => {
+    const jobName = job.toLowerCase()
+    if(!Core.Shared.Jobs[jobName]) return;
+    const jobgrade = Core.Shared.Jobs[jobName].grades[grade]
+    if(jobgrade){
+        source.playerData.job.name = jobName
+        source.playerData.job.grade = {}
+        source.playerData.job.grade.name = jobgrade.name
+        source.playerData.job.grade.level = parseInt(grade)
+        source.playerData.job.payment = jobgrade.payment || 30
+        source.playerData.job.isboss = jobgrade.isboss || false
+    }else{
+        source.playerData.job.name = jobName
+        source.playerData.job.grade = {}
+        source.playerData.job.grade.name = 'No grades'
+        source.playerData.job.grade.level = 0
+        source.playerData.job.payment = 30
+        source.playerData.job.isboss = false
+    }
+
+    const { ssn } = source.playerData
+    db.execute('UPDATE characters SET job = ? WHERE ssn = ?', [JSON.stringify(source.playerData.job), ssn], undefined, alt.resourceName)
+    Core.Functions.emitPlayerData(source, 'job', source.playerData.job)
+    alt.emitClient(source,'notify', 'error', 'JOB SYSTEM', `You are now a ${job}`)
+}
   
+const getJob = (source) => {
+    if(!source || !source.playerData.job) return undefined;
+    return source.playerData.job
+}
 
-
-export default { login,
+export default { 
+    login,
+    whiteliststatus,
     getPlayerIdentifier,
     setPosition,
     getMoney,
@@ -255,5 +314,7 @@ export default { login,
     inviteCallRequest,
     endCall,
     PhoneTunel,
-    GetNumber
+    GetNumber,
+    setJob,
+    getJob
 }

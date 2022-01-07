@@ -3,6 +3,7 @@ import * as chat from 'urp-chat';
 import { defaultInteractions } from '../../shared/configs/examples/interactions';
 import Core from '../main';
 
+
 chat.registerCmd('addItem', (source, args) => {
    const [ item, amount, slot ] = args
    if(!item || !amount){
@@ -31,6 +32,44 @@ chat.registerCmd('tpcds', (source, [x, y, z]) => {
    //}
 })
 
+chat.registerCmd('tpm', (source) => {
+   const isAllowed = Core.Functions.hasPermission(source, 'admin')
+   if(isAllowed){
+      alt.emitClient(source,'tpto');
+   }else{
+      alt.emitClient(source,'notify', 'error', Core.Translate('PERMISSIONS.LABEL'), Core.Translate('PERMISSIONS.DONT_HAVE_PERM'))
+   }
+ })  
+
+
+/**
+ * This function will add a license to a player.
+ * @param source - The player that executed the command.
+ * @param undefined - The first parameter is the source, which is the player who executed the
+command.
+ * @returns The license is being returned to the player.
+ */
+ chat.registerCmd('glicense', (source, [identifier,type]) => {
+   const target = alt.Player.all.find(source => 
+      source.playerData.id === identifier)
+      if(!target || target === source) return alt.emitClient(source,'notify', 'error', Core.Translate('SYSTEM.LABEL'), Core.Translate('SYSTEM.NO_TARGET_FOUND'))
+   alt.emit('License:addLicense', target, type)
+   alt.emitClient(source,'notify', 'success', Core.Translate('LICENSE.LABEL'), Core.Translate('LICENSE.LICENSE_ISSUED', { licenseType: type }))
+ }) 
+
+/**
+ * This function will remove a license from a player.
+ * @param source - The player who executed the command.
+ * @param undefined - The first parameter is the source player.
+ * @returns The license type.
+ */
+ chat.registerCmd('rlicense', (source, [identifier,type]) => {
+   const target = alt.Player.all.find(source => 
+      source.playerData.id === identifier)
+      if(!target || target === source) return alt.emitClient(source,'notify', 'error', Core.Translate('SYSTEM.LABEL'), Core.Translate('SYSTEM.NO_TARGET_FOUND'))
+   alt.emit('License:removeLicense', target, type)
+   alt.emitClient(source,'notify', 'success', Core.Translate('LICENSE.LABEL'), Core.Translate('LICENSE.LICENSE_REVOKED', { licenseType: type }))
+ }) 
 
 chat.registerCmd('c', (source, [model]) => {
    if(!model){
@@ -45,13 +84,40 @@ chat.registerCmd('c', (source, [model]) => {
   // alt.emitClient(source,'notify', 'error', Core.Translate('PERMISSIONS.LABEL'), Core.Translate('PERMISSIONS.DONT_HAVE_PERM'))
  // }
 })
+chat.registerCmd('anuncio', (source, [model]) => {
+   if (!source) return
+   alt.emitClient(source,'notifyCenter', 'comunicado', model)
+})
+
+//Delete Spawn Vehicle or store player vehicle to garrage
+chat.registerCmd('dv', (source) => {
+  const isAllowed = Core.Functions.hasPermission(source, 'admin')
+  if(isAllowed){
+   const closestVeh = alt.Vehicle.all.find((v) => source.pos.distanceTo(v.pos) < 50)
+   if(!closestVeh){
+       alt.emitClient(source,'notify', 'error', 'GARAGE', 'YOU DONT HAVE ANY VEHICLE OF YOURS CLOSE TO YOU')
+       return;
+   }
+   //Destroy veh now
+   Core.Vehicles.putInGarage(source, closestVeh)
+  }else{
+  alt.emitClient(source,'notify', 'error', Core.Translate('PERMISSIONS.LABEL'), Core.Translate('PERMISSIONS.DONT_HAVE_PERM'))
+ }
+})
+
 
 // TODO
 chat.registerCmd('whitelist', (source, [id])=>{
+   const isAllowed = Core.Functions.hasPermission(source, 'admin')
+   if(isAllowed){
    if(!id){
-      alt.emitClient(source,'notify', 'error', Core.Translate('COMMANDS.LABEL'), 'Especifique um id para adicionar a whitelist')
-      return;
-   }
+         alt.emitClient(source,'notify', 'error', Core.Translate('COMMANDS.LABEL'), 'Especifique um id para adicionar a whitelist')
+         return;
+      }
+      Core.Functions.whiteliststatus(source, id)
+}else{
+      alt.emitClient(source,'notify', 'error', Core.Translate('PERMISSIONS.LABEL'), Core.Translate('PERMISSIONS.DONT_HAVE_PERM'))
+     }
 })
 
 
@@ -198,4 +264,14 @@ chat.registerCmd('showid', (source) => {
 chat.registerCmd('showssn', (source) => {
    if(!source.playerData) return;
    chat.send(source, `your ssn is ${source.playerData.ssn}`);
+})
+
+chat.registerCmd('setJob', (source, [job, grade]) => {
+   if(!source) return;
+   const isAllowed = Core.Functions.hasPermission(source, 'admin')
+   if(!isAllowed){
+     alt.emitClient(source,'notify', 'error', Core.Translate('PERMISSIONS.LABEL'), Core.Translate('PERMISSIONS.DONT_HAVE_PERM'))
+     return;
+   }
+   Core.Functions.setJob(source, job, grade)
 })
