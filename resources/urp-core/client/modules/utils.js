@@ -153,7 +153,7 @@ let isOpen = true;
 
 alt.everyTick(() => {
     drawText2D(
-        'URP OpenSource DEMO',
+        'AWL RP Alpha',
         { x: 0.5, y: 0.0125 },
         0.35,
         { r: 255, g: 255, b: 255, a: 125 },
