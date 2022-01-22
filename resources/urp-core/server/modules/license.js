@@ -1,31 +1,29 @@
-import * as alt from 'alt-server'
+import * as alt from 'alt-server';
 import Core from '../main';
 
 alt.on('License:addLicense', async (target, type) => {
-    AddLicense(target, type)
-})
-
+    addLicense(target, type);
+});
 
 alt.on('License:removeLicense', async (target, type) => {
-    RemoveLicense(target, type)
-})
+    removeLicense(target, type);
+});
 
 alt.on('Core:getLicense', async (type, cb) => {
-    GetLicense(type, cb)
-})
+    getLicense(type, cb);
+});
 
 alt.on('Core:getLicenses', async (type, cb) => {
-    GetLicenses(type, cb)
-})
+    getLicenses(type, cb);
+});
 
 alt.on('Core:checkLicense', async (target, type, cb) => {
-    CheckLicense(target, type, cb)
-})
+    checkLicense(target, type, cb);
+});
 
 alt.on('Core:getLicensesList', async (cb) => {
-    GetLicensesList(cb)
-})
-
+    getLicensesList(cb);
+});
 
 /**
  * This function will add a license to a player.
@@ -33,17 +31,27 @@ alt.on('Core:getLicensesList', async (cb) => {
  * @param type - The type of license you want to add.
  * @returns The player's playerData.metadata.licences object.
  */
-const AddLicense = (target, type) => {
-    if (!target || !target.valid ) {
+const addLicense = (target, type) => {
+    if (!target || !target.valid) {
         return;
     }
-    if(!target.playerData.metadata.licences[type]){
-        target.playerData.metadata.licences[type] = true
-        Core.Character.saveMetadata(target)
-        Core.Functions.emitPlayerData(target, 'metadata', target.playerData.metadata)
-        alt.emitClient(target,'notify', 'success', Core.Translate('LICENSE.LABEL'), Core.Translate('LICENSE.LICENSE_ISSUED', { licenseType: type }))
+    if (!target.playerData.metadata.licences[type]) {
+        target.playerData.metadata.licences[type] = true;
+        Core.Character.saveMetadata(target);
+        Core.Functions.emitPlayerData(
+            target,
+            'metadata',
+            target.playerData.metadata
+        );
+        alt.emitClient(
+            target,
+            'notify',
+            'success',
+            Core.Translate('LICENSE.LABEL'),
+            Core.Translate('LICENSE.LICENSE_ISSUED', { licenseType: type })
+        );
     }
-}
+};
 
 /**
  * This function will remove a license from a player.
@@ -51,40 +59,50 @@ const AddLicense = (target, type) => {
  * @param type - The type of license to remove.
  * @returns The player's license data.
  */
-const RemoveLicense = (target, type) => {
+const removeLicense = (target, type) => {
     if (!target || !target.valid) {
         return;
     }
-    if(target.playerData.metadata.licences[type]){
-        target.playerData.metadata.licences[type] = false
-        Core.Character.saveMetadata(target)
-        Core.Functions.emitPlayerData(target, 'metadata', target.playerData.metadata)
-        alt.emitClient(target,'notify', 'success', Core.Translate('LICENSE.LABEL'), Core.Translate('LICENSE.LICENSE_REVOKED', { licenseType: type }))
+    if (target.playerData.metadata.licences[type]) {
+        target.playerData.metadata.licences[type] = false;
+        Core.Character.saveMetadata(target);
+        Core.Functions.emitPlayerData(
+            target,
+            'metadata',
+            target.playerData.metadata
+        );
+        alt.emitClient(
+            target,
+            'notify',
+            'success',
+            Core.Translate('LICENSE.LABEL'),
+            Core.Translate('LICENSE.LICENSE_REVOKED', { licenseType: type })
+        );
     }
-}
+};
 
-const GetLicense = (type, cb) => {
+const getLicense = (type, cb) => {
     if (!target || !target.valid) {
         return;
     }
-}
+};
 
-const GetLicenses = (target, type, cb) => {
+const getLicenses = (target, type, cb) => {
     if (!target || !target.valid) {
         return;
     }
-}
+};
 
-const CheckLicense = (type, cb) => {
+const checkLicense = (type, cb) => {
     if (!target || !target.valid) {
         return;
     }
-}
+};
 
-const GetLicensesList = (cb) => {
+const getLicensesList = (cb) => {
     if (!target || !target.valid) {
         return;
     }
-}
+};
 
-export default { AddLicense }
+export default { addLicense, removeLicense };

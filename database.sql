@@ -6,7 +6,7 @@ USE `urp`;
 CREATE TABLE IF NOT EXISTS `characters` (
   `id` int NOT NULL AUTO_INCREMENT,
   `ssn` varchar(50) NOT NULL,
-  `cid` int DEFAULT NULL,
+  `dimension` int DEFAULT NULL,
   `socialID` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `money` text NOT NULL,
@@ -80,10 +80,11 @@ CREATE TABLE IF NOT EXISTS `characters_vehicles` (
 CREATE TABLE IF NOT EXISTS `characters_homes`(
   `id` int NOT NULL AUTO_INCREMENT,
   `ssn` varchar(255) NOT NULL,
-  `home` VARCHAR(100),
-  `number` INTEGER,
-  UNIQUE(home,number),
+  `name` VARCHAR(100),
+  `chest` longtext DEFAULT NULL,
+  `slot` INTEGER,
   PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `home` (`name`,`slot`) USING BTREE,
   KEY `ssn` (`ssn`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1;
 

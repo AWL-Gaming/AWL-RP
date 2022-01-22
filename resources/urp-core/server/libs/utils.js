@@ -1,62 +1,73 @@
 import * as alt from 'alt-server';
+import { createRequest } from 'urp-notify';
 import db from 'mysql2-wrapper';
 import sjcl from 'sjcl';
+
+// Prompt WRAPPER
+const requestPrompt = (target, message, time) => {
+    return new Promise((resolve, reject) => {
+        const resolvePromise = (response) => {
+            resolve(response);
+        };
+        createRequest(target, message, time, resolvePromise);
+    });
+};
 
 // Database WRAPPERS
 const executeSync = (query, parameters) => {
     return new Promise((resolve, reject) => {
         const resolvePromise = (response) => {
-            resolve(response)
-        }
-        db.execute(query, parameters, resolvePromise, alt.resourceName)
-    })
-}
+            resolve(response);
+        };
+        db.execute(query, parameters, resolvePromise, alt.resourceName);
+    });
+};
 
 const insertSync = (query, parameters) => {
     return new Promise((resolve, reject) => {
         const resolvePromise = (response) => {
-            resolve(response)
-        }
-        db.insert(query, parameters, resolvePromise, alt.resourceName)
-    })
-}
+            resolve(response);
+        };
+        db.insert(query, parameters, resolvePromise, alt.resourceName);
+    });
+};
 
 const updateSync = (query, parameters) => {
     return new Promise((resolve, reject) => {
         const resolvePromise = (response) => {
-            resolve(response)
-        }
-        db.update(query, parameters, resolvePromise, alt.resourceName)
-    })
-}
+            resolve(response);
+        };
+        db.update(query, parameters, resolvePromise, alt.resourceName);
+    });
+};
 
-/** 
-* Gets the direction the player is facing.
-* @param {alt.Vector3} rot
-*/
+/**
+ * Gets the direction the player is facing.
+ * @param {alt.Vector3} rot
+ */
 function getForwardVector(rot) {
-   const z = rot.z;
-   const x = rot.x;
-   const num = Math.abs(Math.cos(x));
-   return new alt.Vector3(-Math.sin(z) * num, Math.cos(z) * num, Math.sin(x));
+    const z = rot.z;
+    const x = rot.x;
+    const num = Math.abs(Math.cos(x));
+    return new alt.Vector3(-Math.sin(z) * num, Math.cos(z) * num, Math.sin(x));
 }
 
-/** 
-* Return a position in front of a player based on distance.
-* @export
-* @param {alt.Player} player
-* @param {number} distance
-* @return {*}  {alt.Vector3}
-*/
-function getVectorInFrontOfPlayer(source, distance)  {
-   const forwardVector = getForwardVector(source.rot);
-   const posFront = {
-       x: source.pos.x + forwardVector.x * distance,
-       y: source.pos.y + forwardVector.y * distance,
-       z: source.pos.z
-   };
+/**
+ * Return a position in front of a player based on distance.
+ * @export
+ * @param {alt.Player} player
+ * @param {number} distance
+ * @return {*}  {alt.Vector3}
+ */
+function getVectorInFrontOfPlayer(source, distance) {
+    const forwardVector = getForwardVector(source.rot);
+    const posFront = {
+        x: source.pos.x + forwardVector.x * distance,
+        y: source.pos.y + forwardVector.y * distance,
+        z: source.pos.z,
+    };
 
-   return new alt.Vector3(posFront.x, posFront.y, posFront.z);
+    return new alt.Vector3(posFront.x, posFront.y, posFront.z);
 }
 
 /**
@@ -78,9 +89,17 @@ function getClosestEntity(
     let position;
 
     if (!checkBackwards) {
-        position = new alt.Vector3(playerPosition.x + fwdVector.x * dist, playerPosition.y + fwdVector.y * dist, playerPosition.z)
+        position = new alt.Vector3(
+            playerPosition.x + fwdVector.x * dist,
+            playerPosition.y + fwdVector.y * dist,
+            playerPosition.z
+        );
     } else {
-        position = new alt.Vector3(playerPosition.x - fwdVector.x * dist, playerPosition.y - fwdVector.y * dist, playerPosition.z)
+        position = new alt.Vector3(
+            playerPosition.x - fwdVector.x * dist,
+            playerPosition.y - fwdVector.y * dist,
+            playerPosition.z
+        );
     }
 
     let lastRange = 25;
@@ -116,9 +135,11 @@ function getClosestEntity(
 const hashString = (plainString) => {
     const saltBits = sjcl.random.randomWords(24, 0);
     const salt = sjcl.codec.base64.fromBits(saltBits);
-    const key = sjcl.codec.base64.fromBits(sjcl.misc.pbkdf2(plainString, saltBits, 2000, 48));
+    const key = sjcl.codec.base64.fromBits(
+        sjcl.misc.pbkdf2(plainString, saltBits, 2000, 48)
+    );
     return `${key}$${salt}`;
-}
+};
 
 /**
  * Test a pbkdf2 hash and salt against a plain text password.
@@ -136,6 +157,16 @@ const compareHash = (plainString, pbkdf2Hash) => {
     }
 
     return true;
-}
+};
 
-export { executeSync, insertSync, updateSync, hashString, compareHash, getForwardVector, getVectorInFrontOfPlayer, getClosestEntity }
+export {
+    executeSync,
+    insertSync,
+    updateSync,
+    hashString,
+    compareHash,
+    getForwardVector,
+    getVectorInFrontOfPlayer,
+    getClosestEntity,
+    requestPrompt,
+};
