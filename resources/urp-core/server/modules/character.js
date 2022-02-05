@@ -25,9 +25,8 @@ const startCharacter = async (source, newCharacter = undefined) => {
         playerData.metadata = JSON.parse(playerData.metadata);
         playerData.charinfo = JSON.parse(playerData.charinfo);
         playerData.phone = playerData.charinfo.phone;
-        playerData.inventory = playerData.inventory
-            ? JSON.parse(playerData.inventory)
-            : [];
+        playerData.inventory = JSON.parse(playerData.inventory);
+
         checkPlayerData(source, playerData);
         return;
     }
@@ -82,7 +81,8 @@ const checkPlayerData = async (source, playerData = undefined) => {
         //Position
         playerData.position = Core.Config.DefaultSpawn;
         //Inventory
-        playerData.inventory = [];
+        playerData.inventory = [[], [{}, {}, {}]];
+
         createCharacter(source, playerData, false);
         return;
     }
@@ -90,9 +90,14 @@ const checkPlayerData = async (source, playerData = undefined) => {
 };
 
 const tickManager = async (source) => {
-    if (!source.nextPingTime && !source.timeHungerThirstDec) {
+    if (
+        !source.nextPingTime &&
+        !source.timeHungerThirstDec &&
+        !source.payCheckTimeOut
+    ) {
         source.nextPingTime = Date.now() + Core.Config.SaveInterval;
         source.timeHungerThirstDec = Date.now() + Core.Config.HungerThirstTime;
+        source.payCheckTimeOut = Date.now() + Core.Config.payCheckTimeOut;
     }
 
     if (Date.now() > source.nextPingTime) {
@@ -107,8 +112,15 @@ const tickManager = async (source) => {
 
     if (source.nextDeathSpawn && Date.now() > source.nextDeathSpawn) {
         setDeath(source, false);
-        source.spawn(0, 0, 0, 0);
+        Core.Inventory.removeAllItems(source);
+        const { x, y, z } = Core.Config.DefaultHospital;
+        source.spawn(x, y, z, 0);
         alt.emitClient(source, 'Core:Character:Respawned');
+    }
+
+    if (Date.now() > source.payCheckTimeOut) {
+        source.payCheckTimeOut = Date.now() + Core.Config.payCheckTimeOut;
+        Core.Job.verifyPayCheck(source);
     }
 
     // if(source.vehicle && source.vehicle.driver === source){
@@ -123,14 +135,14 @@ const addHungerThirstDecay = (source) => {
         source.playerData.metadata.hunger === undefined ||
         source.playerData.metadata.hunger === null
     ) {
-        source.playerData.metadata.hunger = 100;
+        source.playerData.metadata.hunger = Core.Config.DefaultHunger;
     }
 
     if (
         source.playerData.metadata.thirst === undefined ||
         source.playerData.metadata.thirst === null
     ) {
-        source.playerData.metadata.thirst = 100;
+        source.playerData.metadata.thirst = Core.Config.DefaultThirst;
     }
 
     source.playerData.metadata.hunger -= Core.Config.HungerRate;
@@ -161,16 +173,22 @@ const addHungerThirstDecay = (source) => {
 const addHungerThirst = (source, itemtype, value) => {
     if (!source) return;
 
-    if (itemtype === 'drinking' && source.playerData.metadata.thirst <= 200) {
+    if (
+        itemtype === 'drinking' &&
+        source.playerData.metadata.thirst <= Core.Config.DefaultThirst
+    ) {
         source.playerData.metadata.thirst += value;
-        if (source.playerData.metadata.thirst >= 200)
-            source.playerData.metadata.thirst = 200;
+        if (source.playerData.metadata.thirst >= Core.Config.DefaultThirst)
+            source.playerData.metadata.thirst = Core.Config.DefaultThirst;
     }
 
-    if (itemtype === 'eating' && source.playerData.metadata.hunger <= 200) {
+    if (
+        itemtype === 'eating' &&
+        source.playerData.metadata.hunger <= Core.Config.DefaultHunger
+    ) {
         source.playerData.metadata.hunger += value;
-        if (source.playerData.metadata.hunger >= 200)
-            source.playerData.metadata.hunger = 200;
+        if (source.playerData.metadata.hunger >= Core.Config.DefaultHunger)
+            source.playerData.metadata.hunger = Core.Config.DefaultHunger;
     }
 
     saveMetadata(source);
@@ -183,8 +201,8 @@ const addHungerThirst = (source, itemtype, value) => {
 
 const adminHeal = (source) => {
     if (!source) return;
-    source.playerData.metadata.thirst = 200;
-    source.playerData.metadata.hunger = 200;
+    source.playerData.metadata.thirst = Core.Config.DefaultThirst;
+    source.playerData.metadata.hunger = Core.Config.DefaultHunger;
     source.health = 200;
 
     saveMetadata(source);
@@ -258,7 +276,7 @@ const selectCharacter = async (source, playerData, fromCreation = false) => {
     Core.Functions.emitPlayerData(
         source,
         'inventory',
-        source.playerData.inventory
+        source.playerData.inventory[0]
     );
     Core.Functions.emitPlayerData(
         source,

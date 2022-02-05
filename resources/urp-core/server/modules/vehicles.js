@@ -72,13 +72,19 @@ const addToSource = async (
     newVehicle.position = initialPosition;
     newVehicle.plate = await generatePlate();
     newVehicle.status = { bodyHealth: 1000 };
-    newVehicle.metadata = { fuel: 15 };
+    newVehicle.metadata = {
+        fuel: 15,
+        engineOil: 100,
+        engineWater: 100,
+        lockState: 2,
+    };
+    newVehicle.inventory = [];
     newVehicle.customizations = {
         customPrimaryColor: { r: 0, g: 0, b: 0, a: 255 },
         customSecondaryColor: { r: 0, g: 0, b: 0, a: 255 },
     };
     const id = await insertSync(
-        'INSERT INTO characters_vehicles (ssn, model, position, plate, status, metadata, customizations) VALUES (?,?,?,?,?,?,?)',
+        'INSERT INTO characters_vehicles (ssn, model, position, plate, status, metadata,inventory, customizations) VALUES (?,?,?,?,?,?,?,?)',
         [
             ssn,
             newVehicle.model,
@@ -86,6 +92,7 @@ const addToSource = async (
             newVehicle.plate,
             JSON.stringify(newVehicle.status),
             JSON.stringify(newVehicle.metadata),
+            JSON.stringify(newVehicle.inventory),
             JSON.stringify(newVehicle.customizations),
         ]
     );
@@ -106,7 +113,9 @@ const putInGarage = (source, vehicle) => {
     }
     if (source.playerData.ssn !== vehicle.data.ssn) return;
     if (vehicle.timeoutTicker) {
-        alt.clearTimeout(vehicle.timeoutTicker);
+        try {
+            alt.clearTimeout(vehicle.timeoutTicker);
+        } catch (e) {}
     }
     saveVehicleMetadata(vehicle);
     saveMods(vehicle);
@@ -159,6 +168,7 @@ const spawn = (source, vehicleData, pos, rot) => {
     vehicle.data = vehicleData;
 
     vehicle.numberPlateText = vehicleData.plate;
+    vehicle.lockState = 2;
 
     vehicle.engineOn = false;
 
@@ -181,7 +191,6 @@ const spawn = (source, vehicleData, pos, rot) => {
     if (vehicleData.metadata.trunk) {
         vehicle.setStreamSyncedMeta('trunk', vehicleData.trunk);
     }
-
     vehicle.setStreamSyncedMeta('fuel', vehicleData.metadata.fuel);
     vehicle.setStreamSyncedMeta('owner', vehicleData.ssn);
     vehicle.setStreamSyncedMeta('engine', false);
@@ -201,6 +210,7 @@ const spawnById = async (source, id, pos, rot) => {
     vehicleData[0].status = JSON.parse(vehicleData[0].status);
     vehicleData[0].metadata = JSON.parse(vehicleData[0].metadata);
     vehicleData[0].model = vehicleData[0].model;
+    vehicleData[0].inventory = JSON.parse(vehicleData[0].inventory);
     vehicleData[0].customizations = JSON.parse(vehicleData[0].customizations);
     spawn(source, vehicleData[0], pos, rot);
 };
@@ -285,6 +295,8 @@ const vehicleTick = (vehicle) => {
     if (Date.now() > vehicle.nextUpdate) {
         vehicle.nextUpdate = Date.now() + Core.Config.VehicleUpdate;
         updateFuel(vehicle);
+        //updateEngineOil(vehicle);
+        //updateEngineWater(vehicle);
     }
 };
 
@@ -345,7 +357,6 @@ const updateFuel = (vehicle) => {
         vehicle.data.metadata.fuel = 100;
         vehicle.data.metadata.fuel = 100;
     }
-
     vehicle.data.metadata.fuel -= Core.Config.VehicleFuelLost;
 
     if (vehicle.data.metadata.fuel < 0) {
@@ -367,6 +378,109 @@ const updateFuel = (vehicle) => {
 
     vehicle.data.metadata.fuel = vehicle.data.metadata.fuel.toFixed(2);
     vehicle.setStreamSyncedMeta('fuel', vehicle.data.metadata.fuel);
+    saveVehicleMetadata(vehicle);
+};
+
+const updateEngineOil = (vehicle) => {
+    let engineFail = Math.floor(Math.random() * 100);
+    if (!vehicle || !vehicle.valid || !vehicle.engineOn) return;
+    if (!isNaN(vehicle.data.metadata.engineOil)) {
+        vehicle.data.metadata.engineOil = vehicle.data.metadata.engineOil;
+    } else {
+        vehicle.data.metadata.engineOil = 100;
+    }
+
+    vehicle.data.metadata.engineOil -= Core.Config.VehicleengineOilLost;
+
+    if (vehicle.data.metadata.engineOil <= 2) {
+        vehicle.data.metadata.engineOil = 0;
+        vehicle.engineHealth = 0;
+        if (engineFail > 60) vehicle.engineOn = false;
+        vehicle.setStreamSyncedMeta('engineBroken', true);
+        if (vehicle.driver) {
+            alt.emitClient(
+                vehicle.driver,
+                'notify',
+                'error',
+                'aviso',
+                'O motor do seu veiculo quebrou!'
+            );
+        }
+    }
+
+    if (
+        vehicle.data.metadata.engineOil < 10 &&
+        vehicle.data.metadata.engineOil > 2
+    ) {
+        vehicle.data.metadata.engineOil = 0;
+        vehicle.engineHealth = 20;
+        vehicle.engineOn = false;
+        vehicle.setStreamSyncedMeta('engineBroken', true);
+        if (vehicle.driver) {
+            alt.emitClient(
+                vehicle.driver,
+                'notify',
+                'error',
+                'aviso',
+                'O motor do seu veiculo esta com problemas!'
+            );
+        }
+    }
+
+    vehicle.data.metadata.engineOil = vehicle.data.metadata.engineOil;
+    vehicle.setStreamSyncedMeta('engineOil', vehicle.data.metadata.engineOil);
+    saveVehicleMetadata(vehicle);
+};
+
+const updateEngineWater = (vehicle) => {
+    let engineFail = Math.floor(Math.random() * 100);
+    if (!vehicle || !vehicle.valid || !vehicle.engineOn) return;
+    if (!isNaN(vehicle.data.metadata.engineWater)) {
+        vehicle.data.metadata.engineWater = vehicle.data.metadata.engineWater;
+    } else {
+        vehicle.data.metadata.engineWater = 100;
+    }
+
+    vehicle.data.metadata.engineWater -= Core.Config.VehicleengineWaterLost;
+
+    if (vehicle.data.metadata.engineWater <= 2) {
+        vehicle.data.metadata.engineWater = 0;
+        if (engineFail > 60) vehicle.engineOn = false;
+        vehicle.setStreamSyncedMeta('engineBroken', true);
+        if (vehicle.driver) {
+            alt.emitClient(
+                vehicle.driver,
+                'notify',
+                'error',
+                'aviso',
+                'O motor do seu veiculo quebrou!'
+            );
+        }
+    }
+
+    if (
+        vehicle.data.metadata.engineWater < 10 &&
+        vehicle.data.metadata.engineWater > 2
+    ) {
+        vehicle.data.metadata.engineWater = 0;
+        vehicle.engineHealth = 20;
+        vehicle.setStreamSyncedMeta('engineBroken', true);
+        if (vehicle.driver) {
+            alt.emitClient(
+                vehicle.driver,
+                'notify',
+                'error',
+                'aviso',
+                'O motor do seu veiculo esta com problemas!'
+            );
+        }
+    }
+
+    vehicle.data.metadata.engineWater = vehicle.data.metadata.engineWater;
+    vehicle.setStreamSyncedMeta(
+        'engineWater',
+        vehicle.data.metadata.engineWater
+    );
     saveVehicleMetadata(vehicle);
 };
 
@@ -717,6 +831,7 @@ const reloadMods = (source) => {
 
 const loadStatus = (vehicle, data) => {
     alt.nextTick(() => {
+        vehicle.lockState = 2;
         vehicle.dirtLevel = data.dirtLevel;
         vehicle.bodyHealth = data.bodyHealth;
 
@@ -859,6 +974,25 @@ const loadStatus = (vehicle, data) => {
         );
     });
 };
+
+const vehicleLockState = (source) => {
+    if (!source) return;
+    const closestVeh = alt.Vehicle.all.find(
+        (targetVehicle) =>
+            source.pos.distanceTo(targetVehicle.pos) < 4 &&
+            source.playerData.ssn == targetVehicle.data.ssn
+    );
+
+    if (closestVeh.lockState === 1) {
+        alt.emitClient(source, 'playHowl2d', 'lock.ogg', 0.2);
+        return (closestVeh.lockState = 2);
+    }
+
+    if (closestVeh.lockState === 2) {
+        alt.emitClient(source, 'playHowl2d', 'lock.ogg', 0.2);
+        return (closestVeh.lockState = 1);
+    }
+};
 // const updateVehiclePosition = (vehicle) => {
 //     vehicle.data.position = vehicle.pos
 //     db.execute('UPDATE characters_vehicles SET position = ? WHERE ssn = ?', [JSON.stringify(vehicle.data.position), vehicle.data.ssn], undefined, alt.resourceName)
@@ -886,4 +1020,5 @@ export default {
     reFuel,
     fuelType,
     setNeon,
+    vehicleLockState,
 };
