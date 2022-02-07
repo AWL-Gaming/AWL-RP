@@ -15,7 +15,7 @@ const interactionMode = () => {
         ) {
             return;
         }
-        helpPrompt(`Aperte ~INPUT_FRONTEND_RB~ para interagir`);
+        helpPrompt(`Press ~INPUT_FRONTEND_RB~ to interact`);
         // We can use a keymap in the future :D
         if (natives.isControlJustPressed(0, 206)) {
             alt.emitServer(

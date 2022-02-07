@@ -19,8 +19,8 @@ function MyGarageMap() {
         <div class="viwe-car-overflow" id="viwer-car-car">
         </div>
         <div class="between">
-            <button type="button" class="btn btn-primary" onclick="WithdrawCar()">Retirar</button>
-            <button type="button" class="btn btn-secondary" onclick="SaveCar()">Guardar</button>
+            <button type="button" class="btn btn-primary" onclick="WithdrawCar()">Retrieve</button>
+            <button type="button" class="btn btn-secondary" onclick="SaveCar()">Store</button>
         </div>
     `)
     vehList.map(veh => {
@@ -54,8 +54,8 @@ function CarRentalMap() {
              <div class="viwe-car-overflow" id="viwer-car-car">
              </div>
              <div class="between">
-                 <button type="button" class="btn btn-primary" onclick="WithdrawCar()">Retirar</button>
-                 <button type="button" class="btn btn-secondary" onclick="SaveCar()">Guardar</button>
+                 <button type="button" class="btn btn-primary" onclick="WithdrawCar()">Retrieve</button>
+                 <button type="button" class="btn btn-secondary" onclick="SaveCar()">Store</button>
              </div>
          `)
          CarRental.map(veh => {

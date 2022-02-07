@@ -266,7 +266,7 @@ const createCharacter = async (source, playerData, select = true) => {
 const selectCharacter = async (source, playerData, fromCreation = false) => {
     source.playerData = playerData;
     // const model = 'mp_m_freemode_01'
-    chat.send(source, `Logado com sucesso!`);
+    chat.send(source, `Logged in successfully!`);
     Core.Functions.emitPlayerData(
         source,
         'charinfo',
