@@ -15,7 +15,7 @@ const interactionMode = () => {
         ) {
             return;
         }
-        helpPrompt(`Press ~INPUT_FRONTEND_RB~ to interact`);
+        helpPrompt(`Aperte ~INPUT_FRONTEND_RB~ para interagir`);
         // We can use a keymap in the future :D
         if (natives.isControlJustPressed(0, 206)) {
             alt.emitServer(
@@ -51,19 +51,18 @@ function drawText2D(text, pos, scale, color, alignment = 0, padding = 0) {
 
     natives.endTextCommandDisplayText(pos.x, pos.y, 0);
 }
-
-const drawText = (x, y, width, height, scale, { r, g, b, a }, text) => {
-    natives.setTextFont(4);
-    natives.setTextProportional(0);
-    natives.setTextScale(scale, scale);
-    natives.setTextColour(r, g, b, a);
-    natives.setTextDropShadow(0, 0, 0, 0, 255);
-    natives.setTextEdge(2, 0, 0, 0, 255);
-    natives.setTextDropShadow();
+const drawText = (text, position, font, scale) => {
+    natives.setDrawOrigin(position.x, position.y, position.z - 0.5, 0);
+    natives.beginTextCommandDisplayText('STRING');
+    natives.addTextComponentSubstringPlayerName(text);
+    natives.setTextFont(font);
+    natives.setTextScale(1, scale);
+    natives.setTextWrap(0.0, 1.0);
+    natives.setTextCentre(true);
+    natives.setTextColour(255, 255, 255, 255);
     natives.setTextOutline();
-    natives.setTextEntry('STRING');
-    natives.addTextComponentString(text);
-    natives.drawText(x - width / 2, y - height / 2 + 0.005);
+    natives.endTextCommandDisplayText(0, 0, 0);
+    natives.clearDrawOrigin();
 };
 
 const drawText3D = (x, y, z, text) => {
@@ -141,92 +140,34 @@ const createCamera = (camx, camy, camz, rotx, roty, angle, timelapse) => {
     natives.setCamFov(primaryCamera, 55);
     natives.renderScriptCams(true, true, 0, true, false, 0);
 };
-alt.on('keydown', (key) => {
-    if (key === 112 && isOpen) {
-        isOpen = false;
-    } else {
-        isOpen = true;
-    }
-});
-
-let isOpen = true;
-
-alt.everyTick(() => {
-    drawText2D(
-        'AWL RP Alpha',
-        { x: 0.5, y: 0.0125 },
-        0.35,
-        { r: 255, g: 255, b: 255, a: 125 },
-        0
+let drawMarker = (pos, data) => {
+    natives.drawMarker(
+        data.type,
+        pos.x,
+        pos.y,
+        pos.z,
+        data.dirx || 0,
+        data.diry || 0,
+        data.dirz || 0,
+        data.rotx || 0,
+        data.roty || 0,
+        data.rotz || 0,
+        data.scalex || 2.5,
+        data.scaley || 2.5,
+        data.scalez || 2.5,
+        data.r,
+        data.g,
+        data.b,
+        data.a,
+        data.bobAndDown || false,
+        data.faceCamera || true,
+        data.p19 || 2,
+        data.rotate || false,
+        data.textureDict || undefined,
+        data.textureName || undefined,
+        data.drawOnEnts || false
     );
-    if (isOpen) {
-        drawText2D(
-            'F1: toggle HUD',
-            { x: 0.8, y: 0.025 },
-            0.35,
-            { r: 255, g: 255, b: 255, a: 255 },
-            1
-        );
-        drawText2D(
-            'T / Enter: open chat',
-            { x: 0.8, y: 0.05 },
-            0.35,
-            { r: 255, g: 255, b: 255, a: 255 },
-            1
-        );
-        drawText2D(
-            '/noclip',
-            { x: 0.8, y: 0.075 },
-            0.35,
-            { r: 255, g: 255, b: 255, a: 255 },
-            1
-        );
-        drawText2D(
-            '/cloth, [component, drawable, texture]',
-            { x: 0.8, y: 0.1 },
-            0.35,
-            { r: 255, g: 255, b: 255, a: 255 },
-            1
-        );
-        drawText2D(
-            '/addmoney [moneytype, amount], moneytype = cash or bank',
-            { x: 0.8, y: 0.125 },
-            0.35,
-            { r: 255, g: 255, b: 255, a: 255 },
-            1
-        );
-        drawText2D(
-            '/toggleEngine',
-            { x: 0.8, y: 0.15 },
-            0.35,
-            { r: 255, g: 255, b: 255, a: 255 },
-            1
-        );
-        drawText2D(
-            '/showid',
-            { x: 0.8, y: 0.175 },
-            0.35,
-            { r: 255, g: 255, b: 255, a: 255 },
-            1
-        );
-        drawText2D(
-            '/showssn',
-            { x: 0.8, y: 0.2 },
-            0.35,
-            { r: 255, g: 255, b: 255, a: 255 },
-            1
-        );
-        drawText2D(
-            '/addItem [item, amount, slot]',
-            { x: 0.8, y: 0.225 },
-            0.35,
-            { r: 255, g: 255, b: 255, a: 255 },
-            1
-        );
-        //drawText2D('/', { x: 0.8, y: 0.25 }, 0.35, { r: 255, g: 255, b: 255, a: 255 }, 1);
-        //drawText2D('/', { x: 0.8, y: 0.275 }, 0.35, { r: 255, g: 255, b: 255, a: 255 }, 1);
-    }
-});
+};
 
 export default {
     drawText,
@@ -236,4 +177,5 @@ export default {
     destroyCam,
     createCamera,
     drawTextHelper,
+    drawMarker,
 };

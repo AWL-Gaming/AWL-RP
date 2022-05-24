@@ -31,6 +31,8 @@ URPConfig.HungerThirstTime = 1000 * 60 * 5;
 //Paycheck
 URPConfig.payCheckTimeOut = 1000 * 60 * 10;
 
+URPConfig.moneyTick = 1000 * 60 * 10;
+
 URPConfig.DefaultMoney = { cash: 5000, bank: 5000, crypto: 0 };
 URPConfig.DefaultInfo = {
     firstname: 'Firstname',
@@ -54,6 +56,8 @@ URPConfig.DefaultMeta = {
     criminalrecord: {
         hasRecord: false,
     },
+    isInJail: false,
+    jailTime: 0,
     licences: {
         business: false,
         weapon: false,
@@ -71,9 +75,8 @@ URPConfig.DefaultMeta = {
     hunger: URPConfig.DefaultHunger,
     armour: 0,
     health: 200,
+    maxWeight: 60000,
 };
-URPConfig.MaxInvSlots = 41;
-URPConfig.MaxWeight = 120000; //120 kg in grams
 //LANG
 URPConfig.lang = 'en';
 //URPConfig.lang = "pt-BR"

@@ -77,6 +77,7 @@ const addToSource = async (
         engineOil: 100,
         engineWater: 100,
         lockState: 2,
+        trunkSize: VehList[model].trunk,
     };
     newVehicle.inventory = [];
     newVehicle.customizations = {
@@ -169,9 +170,8 @@ const spawn = (source, vehicleData, pos, rot) => {
 
     vehicle.numberPlateText = vehicleData.plate;
     vehicle.lockState = 2;
-
     vehicle.engineOn = false;
-
+    vehicle.trunkSize = vehicleData.metadata.trunkSize;
     if (
         vehicleData.customizations.customPrimaryColor &&
         vehicleData.customizations.customSecondaryColor
@@ -188,9 +188,6 @@ const spawn = (source, vehicleData, pos, rot) => {
         loadStatus(vehicle, vehicleData.status);
     }
 
-    if (vehicleData.metadata.trunk) {
-        vehicle.setStreamSyncedMeta('trunk', vehicleData.trunk);
-    }
     vehicle.setStreamSyncedMeta('fuel', vehicleData.metadata.fuel);
     vehicle.setStreamSyncedMeta('owner', vehicleData.ssn);
     vehicle.setStreamSyncedMeta('engine', false);
@@ -277,9 +274,6 @@ const sourceLeavesVehicle = (source, vehicle, seat) => {
                     vehicle.pos.z
             );
         }
-
-        // If car in future will stay spawned
-        // updateVehiclePosition(vehicle)
     }
 };
 
@@ -532,7 +526,7 @@ const hasFuel = (source) => {
     const closestVeh = alt.Vehicle.all.find(
         (targetVehicle) => source.pos.distanceTo(targetVehicle.pos) < 3.5
     );
-    if (!closestVeh) return alt.log(`nao tem carro perto`);
+    if (!closestVeh) return;
     if (!closestVeh.data) return;
     return closestVeh.data.metadata.fuel;
 };
@@ -540,7 +534,7 @@ const fuelTankSize = (source) => {
     const closestVeh = alt.Vehicle.all.find(
         (targetVehicle) => source.pos.distanceTo(targetVehicle.pos) < 3.5
     );
-    if (!closestVeh) return alt.log(`nao tem carro perto`);
+    if (!closestVeh) return;
     if (!closestVeh.data) return;
     let model = closestVeh.data.model;
     if (!VehList[model]) return 50;
@@ -550,7 +544,7 @@ const fuelType = (source) => {
     const closestVeh = alt.Vehicle.all.find(
         (targetVehicle) => source.pos.distanceTo(targetVehicle.pos) < 3.5
     );
-    if (!closestVeh) return alt.log(`nao tem carro perto`);
+    if (!closestVeh) return;
     if (!closestVeh.data) return;
     let model = closestVeh.data.model;
     return VehList[model].fuelType;
@@ -559,7 +553,7 @@ const reFuel = (source, value) => {
     const closestVeh = alt.Vehicle.all.find(
         (targetVehicle) => source.pos.distanceTo(targetVehicle.pos) < 3.5
     );
-    if (!closestVeh) return alt.log(`nao tem carro perto`);
+    if (!closestVeh) return;
     if (!closestVeh.data) return;
     closestVeh.data.metadata.fuel =
         parseInt(closestVeh.data.metadata.fuel) + parseInt(value);
@@ -975,28 +969,19 @@ const loadStatus = (vehicle, data) => {
     });
 };
 
-const vehicleLockState = (source) => {
-    if (!source) return;
-    const closestVeh = alt.Vehicle.all.find(
-        (targetVehicle) =>
-            source.pos.distanceTo(targetVehicle.pos) < 4 &&
-            source.playerData.ssn == targetVehicle.data.ssn
-    );
+const vehicleLockState = (source, vehicle) => {
+    if (!source || !vehicle) return;
 
-    if (closestVeh.lockState === 1) {
+    if (vehicle.lockState === 1) {
         alt.emitClient(source, 'playHowl2d', 'lock.ogg', 0.2);
-        return (closestVeh.lockState = 2);
+        return (vehicle.lockState = 2);
     }
 
-    if (closestVeh.lockState === 2) {
+    if (vehicle.lockState === 2) {
         alt.emitClient(source, 'playHowl2d', 'lock.ogg', 0.2);
-        return (closestVeh.lockState = 1);
+        return (vehicle.lockState = 1);
     }
 };
-// const updateVehiclePosition = (vehicle) => {
-//     vehicle.data.position = vehicle.pos
-//     db.execute('UPDATE characters_vehicles SET position = ? WHERE ssn = ?', [JSON.stringify(vehicle.data.position), vehicle.data.ssn], undefined, alt.resourceName)
-// }
 
 export default {
     pool,

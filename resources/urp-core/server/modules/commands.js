@@ -340,7 +340,7 @@ chat.registerCmd('whitelist', (source, [socialID]) => {
                 'notify',
                 'error',
                 Core.Translate('COMMANDS.LABEL'),
-                'Specify an id to add to whitelist '
+                'Especifique um id para adicionar a whitelist'
             );
             return;
         }

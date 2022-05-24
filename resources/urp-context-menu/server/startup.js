@@ -7,20 +7,25 @@ import * as chat from 'urp-chat';
 // VEHICLE CONTEXT EVENTS
 ////////////////////////////////////////////////////////////////////////////////////
 
-alt.onClient('context:vehicle:engine', (source) => {
-    Core.Vehicles.handleToggleEngine(source, source.vehicle);
+alt.onClient('context:vehicle:engine', (source, vehicle) => {
+    Core.Vehicles.handleToggleEngine(source, vehicle);
+});
+
+alt.onClient('context:vehicle:lock', (source, vehicle) => {
+    if (!source || !vehicle) return;
+    Core.Vehicles.vehicleLockState(source, vehicle);
 });
 
 /////////////////////////////////////////////////////////////////////////////////////
 // POLICE CONTEXT EVENTS
 ////////////////////////////////////////////////////////////////////////////////////
 
-alt.onClient('context:police:cuff', (source) => {
-    Core.Police.setHandcuffs(source);
+alt.onClient('context:police:cuff', (source, targetPlayer) => {
+    Core.Police.cuffsState(source, targetPlayer);
 });
 
-alt.onClient('context:police:uncuff', (source) => {
-    Core.Police.removeHandcuffs(source);
+alt.onClient('context:police:putinprison', (source, targetPlayer) => {
+    Core.Police.putInPrison(source, targetPlayer);
 });
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -52,9 +57,4 @@ alt.onClient('context:player:status', (source) => {
         source,
         `your id is ${JSON.stringify(source.getMeta('playerData'))}`
     );
-});
-
-alt.onClient('context:vehicle:lock', (source) => {
-    if (!source) return;
-    Core.Vehicles.vehicleLockState(source);
 });
