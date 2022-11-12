@@ -2,25 +2,25 @@
 # yarn lockfile v1
 
 
-"@altv/types-client@^1.9.9":
-  version "1.9.9"
-  resolved "https://registry.yarnpkg.com/@altv/types-client/-/types-client-1.9.9.tgz#9c272135577f2c5e134419588d53ba303709414a"
-  integrity sha512-9cTBQnvcMzIi5+jX7heHruu85R7gru1nmQj75aorJt5sTVR4bH3zwXH688F+EOf0hE9EuuYVV2uwR23rqjg/fQ==
+"@altv/types-client@^2.1.4":
+  version "2.3.7"
+  resolved "https://registry.yarnpkg.com/@altv/types-client/-/types-client-2.3.7.tgz#0c07c701b131dc89553077918f2516d5019d75c6"
+  integrity sha512-WtOIN2ow+s/lfcZhysvkCWrzUBzXhBUncYhExqHa4ySxi6tVhFRNIH5FNygILvAiFeqQPH52E0oGtBJr7xsu1w==
 
 "@altv/types-natives@^1.4.4":
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/@altv/types-natives/-/types-natives-1.4.4.tgz#d71aaf45eb5b1060dd6993ef010bdc1734294a73"
   integrity sha512-qcIPhpRAhGnErtf3p1iVGL6CIUJWc1IdYJl6K9T5c7W8Nd9RM2cv4JIyQg3TTXLiu+1gAZlkD8KyYKIfs5BqnQ==
 
-"@altv/types-server@^2.1.7":
-  version "2.1.9"
-  resolved "https://registry.yarnpkg.com/@altv/types-server/-/types-server-2.1.9.tgz#c379239b04249b8ca4882cfc115a9bb9db88b0f0"
-  integrity sha512-AxRKVAbnEWkPAPH5Lk4NXPk89dCWBIk1MWyU060SW+7QvK2S/qNWTEAe38Iql8n10/qfthkwQkE+UCn9ZM9a+w==
+"@altv/types-server@^2.3.1":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@altv/types-server/-/types-server-2.5.0.tgz#9629be97b58f1812524ea1ca078d9d763b41dd29"
+  integrity sha512-8tc3vz7+PdVHlquSKD5JZjQjFqtnbS+n93bz7xuDfQ6dEHWVIhTW1s3IugJTbMXBhJwhtuey7Vsd2ev4LGiExg==
 
-"@altv/types-shared@^1.1.2":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@altv/types-shared/-/types-shared-1.1.3.tgz#069c51dd644158ec2224237739ed6e81cc805e2b"
-  integrity sha512-CWwWW4A4X5TVGdfdHkEDEB9wJ3F555hCCjxn0BHzj9fNo3o5kwLaGIvsmOcbt/mvGuSsBRRmTZpQBs8C5iBEMA==
+"@altv/types-shared@^1.2.3":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@altv/types-shared/-/types-shared-1.3.1.tgz#1a0ce63b9d197f0b614c68dc4c21de3bf24e033b"
+  integrity sha512-6zepdoj+PoVZOHFfNaevoAIUOKIj/QdnnrhP65tteXa5Slo893jr/RLHHsJsYmJp4K4hKMNt5KazGDzDZO6dEg==
 
 "@altv/types-webview@^1.0.2":
   version "1.0.2"
@@ -272,7 +272,7 @@ commander@^6.0.0:
 concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
-  integrity sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=
+  integrity sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==
 
 config-chain@^1.1.11:
   version "1.1.13"
@@ -949,9 +949,9 @@ mimic-response@^1.0.0, mimic-response@^1.0.1:
   integrity sha512-j5EctnkH7amfV/q5Hgmoal1g2QHFJRraOtmx0JpIqkxhBhI/lJSl1nMpQ45hVarwNETOoWEimndZ4QK0RHxuxQ==
 
 minimatch@^3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
-  integrity sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.1.2.tgz#19cd194bfd3e428f049a70817c038d89ab4be35b"
+  integrity sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==
   dependencies:
     brace-expansion "^1.1.7"
 
