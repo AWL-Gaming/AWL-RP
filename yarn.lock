@@ -2,25 +2,25 @@
 # yarn lockfile v1
 
 
-"@altv/types-client@^1.9.9":
-  version "1.9.9"
-  resolved "https://registry.yarnpkg.com/@altv/types-client/-/types-client-1.9.9.tgz#9c272135577f2c5e134419588d53ba303709414a"
-  integrity sha512-9cTBQnvcMzIi5+jX7heHruu85R7gru1nmQj75aorJt5sTVR4bH3zwXH688F+EOf0hE9EuuYVV2uwR23rqjg/fQ==
+"@altv/types-client@^2.1.4":
+  version "2.4.4"
+  resolved "https://registry.yarnpkg.com/@altv/types-client/-/types-client-2.4.4.tgz#868161364f5df1c60ec467bfef66b9d224dfcc36"
+  integrity sha512-Dt5DiFigJnSL8MHD4YFX3wIiAC/qkg+gqakHNhJxC9lO7tW41P9elMYGNn240rw10IJDKrjNSe2soUrvHHdG/w==
 
 "@altv/types-natives@^1.4.4":
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/@altv/types-natives/-/types-natives-1.4.4.tgz#d71aaf45eb5b1060dd6993ef010bdc1734294a73"
   integrity sha512-qcIPhpRAhGnErtf3p1iVGL6CIUJWc1IdYJl6K9T5c7W8Nd9RM2cv4JIyQg3TTXLiu+1gAZlkD8KyYKIfs5BqnQ==
 
-"@altv/types-server@^2.1.7":
-  version "2.1.9"
-  resolved "https://registry.yarnpkg.com/@altv/types-server/-/types-server-2.1.9.tgz#c379239b04249b8ca4882cfc115a9bb9db88b0f0"
-  integrity sha512-AxRKVAbnEWkPAPH5Lk4NXPk89dCWBIk1MWyU060SW+7QvK2S/qNWTEAe38Iql8n10/qfthkwQkE+UCn9ZM9a+w==
+"@altv/types-server@^2.3.1":
+  version "2.5.7"
+  resolved "https://registry.yarnpkg.com/@altv/types-server/-/types-server-2.5.7.tgz#c87e5bed5e1e8b87574338afb463227821732048"
+  integrity sha512-kntuD2ylwX2wL2TJuArpkWsHrPlYYT4eNKfXglJppDYSIbUsxfvP1Kt3XdBfclaEMU63Jz64mMIJ4FC5M1gKKg==
 
-"@altv/types-shared@^1.1.2":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@altv/types-shared/-/types-shared-1.1.3.tgz#069c51dd644158ec2224237739ed6e81cc805e2b"
-  integrity sha512-CWwWW4A4X5TVGdfdHkEDEB9wJ3F555hCCjxn0BHzj9fNo3o5kwLaGIvsmOcbt/mvGuSsBRRmTZpQBs8C5iBEMA==
+"@altv/types-shared@^1.2.3":
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/@altv/types-shared/-/types-shared-1.3.6.tgz#f76ef5cdd15c6f9f50240ce224dd9e057a8ade96"
+  integrity sha512-1jEfqaqRKxiEoIHEo2th/d2LAHG7HqsiYPFTVv8v4XEhlt+Ny6hE1lX1OmGocCJH0oF7Pin+ZQekou28s5C6ug==
 
 "@altv/types-webview@^1.0.2":
   version "1.0.2"
@@ -956,9 +956,9 @@ minimatch@^3.0.4:
     brace-expansion "^1.1.7"
 
 minimist@^1.2.0:
-  version "1.2.5"
-  resolved "https://registry.npmjs.org/minimist/-/minimist-1.2.5.tgz"
-  integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.8.tgz#c1a464e7693302e082a075cee0c057741ac4772c"
+  integrity sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==
 
 ms@2.1.2:
   version "2.1.2"
