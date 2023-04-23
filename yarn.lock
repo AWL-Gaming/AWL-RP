@@ -2,25 +2,25 @@
 # yarn lockfile v1
 
 
-"@altv/types-client@^1.9.9":
-  version "1.9.9"
-  resolved "https://registry.yarnpkg.com/@altv/types-client/-/types-client-1.9.9.tgz#9c272135577f2c5e134419588d53ba303709414a"
-  integrity sha512-9cTBQnvcMzIi5+jX7heHruu85R7gru1nmQj75aorJt5sTVR4bH3zwXH688F+EOf0hE9EuuYVV2uwR23rqjg/fQ==
+"@altv/types-client@^2.1.4":
+  version "2.5.4"
+  resolved "https://registry.yarnpkg.com/@altv/types-client/-/types-client-2.5.4.tgz#df0ac41697c2e551dda666ccaad1330dea62ff6b"
+  integrity sha512-T32IK5vLFKlyFC+z9AExnNideMl167y87MfyeaJUXidlzDFgmrHJi6CkanHofF0aedg9Kf4UvL9vMSBBAH13RA==
 
 "@altv/types-natives@^1.4.4":
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/@altv/types-natives/-/types-natives-1.4.4.tgz#d71aaf45eb5b1060dd6993ef010bdc1734294a73"
   integrity sha512-qcIPhpRAhGnErtf3p1iVGL6CIUJWc1IdYJl6K9T5c7W8Nd9RM2cv4JIyQg3TTXLiu+1gAZlkD8KyYKIfs5BqnQ==
 
-"@altv/types-server@^2.1.7":
-  version "2.1.9"
-  resolved "https://registry.yarnpkg.com/@altv/types-server/-/types-server-2.1.9.tgz#c379239b04249b8ca4882cfc115a9bb9db88b0f0"
-  integrity sha512-AxRKVAbnEWkPAPH5Lk4NXPk89dCWBIk1MWyU060SW+7QvK2S/qNWTEAe38Iql8n10/qfthkwQkE+UCn9ZM9a+w==
+"@altv/types-server@^2.3.1":
+  version "2.6.7"
+  resolved "https://registry.yarnpkg.com/@altv/types-server/-/types-server-2.6.7.tgz#d533e6fda155bc39d919de9e197dbe33f3cfe856"
+  integrity sha512-zWjbVvu3/YGoBtCL4tx5I7e/MUhY6XA4bcD02mhWqYehA5gRmklMC9No0/CoCrgZtkakLzHRJ8GtDntgvr+DBA==
 
-"@altv/types-shared@^1.1.2":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@altv/types-shared/-/types-shared-1.1.3.tgz#069c51dd644158ec2224237739ed6e81cc805e2b"
-  integrity sha512-CWwWW4A4X5TVGdfdHkEDEB9wJ3F555hCCjxn0BHzj9fNo3o5kwLaGIvsmOcbt/mvGuSsBRRmTZpQBs8C5iBEMA==
+"@altv/types-shared@^1.2.3":
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/@altv/types-shared/-/types-shared-1.4.3.tgz#0f29b54a3dc9b03b2883c286e0cbcbdf596ed659"
+  integrity sha512-NbnUMLfpLd/LDcgaxBltjHvLVRZg2CA/rA1SlvjsmpMtToLDgiDWukIb3RTEi2GJ30rebYt7WfBtnwcY7bbeyg==
 
 "@altv/types-webview@^1.0.2":
   version "1.0.2"
@@ -473,17 +473,10 @@ fd-slicer@~1.1.0:
   dependencies:
     pend "~1.2.0"
 
-fetch-blob@^3.1.2:
-  version "3.1.3"
-  resolved "https://registry.npmjs.org/fetch-blob/-/fetch-blob-3.1.3.tgz"
-  integrity sha512-ax1Y5I9w+9+JiM+wdHkhBoxew+zG4AJ2SvAD1v1szpddUIiPERVGBxrMcB2ZqW0Y3PP8bOWYv2zqQq1Jp2kqUQ==
-  dependencies:
-    web-streams-polyfill "^3.0.3"
-
-fetch-blob@^3.1.3:
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/fetch-blob/-/fetch-blob-3.1.4.tgz#e8c6567f80ad7fc22fd302e7dcb72bafde9c1717"
-  integrity sha512-Eq5Xv5+VlSrYWEqKrusxY1C3Hm/hjeAsCGVG3ft7pZahlUAChpGZT/Ms1WmSLnEAisEXszjzu/s+ce6HZB2VHA==
+fetch-blob@^3.1.2, fetch-blob@^3.1.4:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/fetch-blob/-/fetch-blob-3.2.0.tgz#f09b8d4bbd45adc6f0c20b7e787e793e309dcce9"
+  integrity sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==
   dependencies:
     node-domexception "^1.0.0"
     web-streams-polyfill "^3.0.3"
@@ -987,13 +980,13 @@ node-fetch@^2.6.0:
   dependencies:
     whatwg-url "^5.0.0"
 
-node-fetch@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-3.1.1.tgz#d0d9607e455b3087e3092b821b5b1f1ebf4c2147"
-  integrity sha512-SMk+vKgU77PYotRdWzqZGTZeuFKlsJ0hu4KPviQKkfY+N3vn2MIzr0rvpnYpR8MtB3IEuhlEcuOLbGvLRlA+yg==
+node-fetch@^3.2.10:
+  version "3.2.10"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-3.2.10.tgz#e8347f94b54ae18b57c9c049ef641cef398a85c8"
+  integrity sha512-MhuzNwdURnZ1Cp4XTazr69K0BTizsBroX7Zx3UgDSVcZYKF/6p0CBe4EUb/hLqmzVhl0UpYfgRljQ4yxE+iCxA==
   dependencies:
     data-uri-to-buffer "^4.0.0"
-    fetch-blob "^3.1.3"
+    fetch-blob "^3.1.4"
     formdata-polyfill "^4.0.10"
 
 nodemon@^2.0.15:
